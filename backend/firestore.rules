@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Crisis reports - authenticated users can create, admins can read/update
+    match /crisis_reports/{docId} {
+      allow create: if request.auth != null;
+      allow read, update: if request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Users - users can read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
